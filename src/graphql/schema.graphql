@@ -1,0 +1,528 @@
+scalar Date
+scalar File
+
+type Query {
+  users: [User!]!
+  comments: [Comment]!
+  stuff: [Stuff!]!
+  findAvailableStuff: [Stuff!]!
+  getStuffById(id: ID!): Stuff
+  searchByNameAndSlug(input: SearchInput): StuffPaging!
+  getAllPostedStuff(page: Int, limit: Int): [Stuff]!
+  getStuffByUid(excludeSuggested: Boolean): [Stuff]!
+  getAvailableStuffByUid: [Stuff]!
+  getCommentsByStuffId(stuffId: ID!): [Comment!]!
+  getSaleStuff: [Stuff!]!
+  getAllAuctions(isApproved: Boolean): [Auction!]!
+  getAllApprovedAuctions(startedOnly: Boolean): [Auction!]!
+  getRelateStuff(stuffId: ID): [Stuff!]!
+  stuffByTypeSlug(typeSlug: String!): [Stuff!]!
+  types: [Type!]!
+  typeBySlug(slug: String!): Type!
+  categories: [Category!]!
+  categoryBySlug(slug: String!): Category!
+  getTransactionsByUserID: [Transaction!]!
+  getTransactionByID(id: ID!): Transaction
+  getPickupTransactions: [Transaction!]!
+  conversations: [Conversation!]!
+  messages(channelId: String!): [Message!]!
+  getExchangeSuggestStuff(stuffId: ID): [SuggestedStuff]!
+  getNotificationByUID(includeOfMod: Boolean): [Notification!]!
+  getUnreadNotification: ReturnTotalUnreadNotification
+  getPointHistoryByUserId(userId: String): [PointHistory]!
+  filterListTransaction(filter: Int!): [Transaction]!
+  getBiddingHistory(stuff_id: ID!): [BiddingHistory]!
+  getIssueByTransactionId(transaction_id: String!): [TransactionIssue]!
+  getIssueById(id: String!): TransactionIssue!
+  getAuctionByStuffId(stuffId: ID!): Auction
+  getFeedbackById(feedback_id: String!): Feedback!
+  getFeedBackByUid: [Feedback]
+  isFirstLogin: Boolean!
+  getAllStuffIssues: [StuffIssue!]!
+  getStuffIssueById(id: ID!): StuffIssue
+  getAllStuffIssuesByUID: [StuffIssue!]!
+  userGetFeedback: [Feedback]
+  viewOrtherFeedback(id: String): [Feedback]
+  viewOrtherRating(id: String): Float
+  adminTendency(start: Date, end: Date): Tendency
+  getFiveRichest: [User]
+  getFiveHightestTransaction(start: Date, end: Date): [Transaction]
+  getUserCreated(start: Date, end: Date): [User]
+  getTransactionRates(start: Date, end: Date): RateResponse
+  getPopularCategories: [PopularCategoriesResponse]
+  getTransactionsByTypes: String
+  getTopActiveUser: [User]
+  getAverageTransactionHappen: Float
+}
+
+type GetTransactionsByTypes {
+  name: String
+  slug: String
+  amounts: [Int]
+}
+
+type PopularCategoriesResponse {
+  name: String
+  slug: String
+  amount: Int
+}
+
+type RateResponse {
+  success: Float
+  pending: Float
+  cancel: Float
+}
+
+type ReturnTotalUnreadNotification {
+  total: Int
+  messages: Int
+}
+
+type Mutation {
+  createStuff(input: StuffInput): Stuff!
+  createType(name: String): Type!
+  updateStuff(input: UpdateStuffInput): Stuff!
+  createQuicklyExchangeStuff(input: QuicklyStuffInput): SuggestedStuff!
+  addExchangeStuff(input: ExchangeInput): SuggestedStuff
+  removeExchangeStuff(exchangeId: ID!): SuggestedStuff
+  deleteStuff(stuffId: ID!): String!
+  readTextFile(file: File!): String!
+  updateUserInfor(input: UserUpdateInforInput!): User!
+  createTransaction(input: TransactionInput!): Transaction!
+  MODConfirmReceivedStuff(input: TransactionEvidence!): Transaction
+  MODConfirmPickup(input: TransactionEvidence!): Transaction
+  MODCreateIssue(input: MODCreateIssue): Transaction!
+  handleIssue(input: HandleIssue): TransactionIssue!
+  updateMeetingDay(transactionId: String!, date: Date!): Transaction!
+  userRequestCancel(input: UserRequestCancel): Transaction!
+  userFeedback(input: FeedbackInput!): Feedback!
+  startConversation(
+    partnerId: String!
+    type: String!
+    stuffId: ID
+    exchangeStuffId: ID
+  ): Conversation
+  detachStuffFromConversation(channelId: String!, all: Boolean): Conversation!
+  createNotificationType(name: String!, slug: String!): NotificationType
+  testNotification: Notification!
+  sendMessage(message: MessageInput): Message!
+  placeABid(stuff_id: ID!, bidding_price: Int!): BiddingHistory
+  startAuction(stuffId: ID!): Auction
+  approveAuction(stuffId: ID!): Auction
+  markReadNotification(id: ID!): Notification
+  markReadAllNotification: String
+  MODDeleteStuff(stuffId: ID!): String!
+  changeUserStatus(id: String!, status: Int!): User!
+  inviteFriend(inviteCode: String!): User!
+  createStuffIssue(input: CreateStuffIssue!): StuffIssue
+  confirmStuffIssueStatus(id: ID!): StuffIssue
+}
+
+# type Subscription {
+#   newSuggestStuff(channelId: String!): SuggestedStuff!
+# }
+
+type Tendency {
+  market: Statistic
+  exchange: Statistic
+  auction: Statistic
+}
+
+type Statistic {
+  create: Int
+  update: Int
+  transaction: Int
+}
+
+type User {
+  id: ID
+  information: Information
+  role_id: Int
+  role: Role
+  point: Int
+  auction_nickname: String
+  invitation_code: String
+  status: Int
+  create_at: Date
+  update_at: Date
+  rating: Float
+  reputation: Int
+  attendance_dates: [Date]!
+}
+
+type Comment {
+  id: ID
+  author: User
+  author_id: String
+  content: String
+  parent: Comment
+  stuff: Stuff
+  stuff_id: ID
+  create_at: Date
+  update_at: Date
+}
+
+type Stuff {
+  id: ID
+  author: User
+  name: String!
+  description: String
+  category: Category
+  address: String
+  comments: [Comment]!
+  payment_type_id: String
+  payment_type: PaymentType
+  condition: Int!
+  price: Int!
+  media: [File]!
+  status: Int!
+  type: Type!
+  transactions: [Transaction]!
+  create_at: Date!
+  update_at: Date
+  tags: [TagWithStuffValue]
+  auction: Auction
+}
+
+type SuggestedStuff {
+  id: ID
+  target_stuff_id: String
+  target_stuff: Stuff!
+  suggest_stuff: Stuff!
+  suggest_stuff_id: ID
+  author: User
+  status: Int
+  create_at: Date!
+  update_at: Date
+}
+
+type PaymentType {
+  id: String!
+  name: String!
+  slug: String!
+  stuffs: [Stuff!]!
+}
+
+type Auction {
+  id: String!
+  stuff_id: String!
+  stuff: Stuff!
+  initial_price: Int!
+  step_price: Int!
+  final_price: Int
+  start_automatically: Boolean
+  status: String
+  total_participants: Int
+  is_approved: Boolean
+  winner_id: String
+  winner: User
+  bidding_history: [BiddingHistory!]!
+  create_at: Date!
+  update_at: Date
+  start_at: Date
+  expire_at: Date
+}
+
+type BiddingHistory {
+  id: String!
+  auction_id: String
+  auction: Auction
+  author_id: String
+  author: User
+  bid_price: Int!
+  create_at: Date!
+  update_at: Date
+}
+
+type Type {
+  id: ID
+  name: String
+  slug: String
+}
+
+type StuffCustomField {
+  final_price: Int
+  price: Int
+  step: Int
+  start_price: Int
+}
+
+type Transaction {
+  id: ID
+  stuff_owner_id: String
+  stuff_owner: User
+  customer_id: String
+  customer: User
+  moderator_id: String
+  moderator: User
+  status: String
+  stuff: Stuff
+  stuff_id: ID
+  exchange_stuff: Stuff
+  exchange_stuff_id: ID
+  amount: Int
+  is_pickup: Boolean
+  expire_at: Date
+  create_at: Date
+  update_at: Date
+}
+
+type TransactionCustomField {
+  phone: String
+  address: String
+  address_details: String
+}
+
+type Category {
+  id: ID
+  name: String
+  slug: String
+}
+
+type Information {
+  email: String
+  full_name: String
+  phone: String
+  address: [String]
+  avatar_url: String
+}
+
+type Role {
+  id: String
+  name: String
+}
+
+type Tags {
+  id: ID
+  name: String
+  value: [String]
+  tagWithStuffValue: [TagWithStuffValue]
+}
+
+type TagWithStuffValue {
+  id: ID
+  tag_id: ID
+  tag_slug: String
+  tag: Tags
+  value: String
+  stuff_id: String
+  stuff: Stuff
+}
+
+type StuffPaging {
+  result: [Stuff]!
+  totalPages: Int!
+}
+
+type Message {
+  id: ID
+  external_id: String
+  content: String!
+  conversation_id: String!
+  conversation: Conversation
+  sender_id: String!
+  sender: User!
+  create_at: Date
+}
+
+type Conversation {
+  id: ID
+  channel_id: String
+  messages: [Message!]!
+  last_message: Message
+  participant_ids: [String]
+  stuff_id: ID
+  stuff: Stuff
+  status: String
+  exchange_stuff_id: ID
+  exchange_stuff: Stuff
+  participants: [User!]!
+  create_at: Date
+  update_at: Date
+}
+
+type Notification {
+  id: ID!
+  content: String
+  target_id: ID
+  target_url: String
+  type_slug: String
+  type: NotificationType
+  status: String
+  actor_id: String
+  actor: User
+  receiver_ids: [String]!
+  receivers: [User]!
+  is_read: Boolean
+  create_at: Date!
+}
+
+type NotificationType {
+  id: ID!
+  name: String!
+  slug: String!
+  create_at: Date!
+  update_at: Date
+  notifications: [Notification!]!
+}
+
+type PointHistory {
+  id: ID!
+  change: Int
+  content: String
+  time: Date
+  user: User
+}
+
+type TransactionIssue {
+  id: String
+  issue: String
+  issue_solved: String
+  create_at: Date
+  update_at: Date
+}
+
+type Feedback {
+  id: String
+  rating: Int
+  content: String
+  transaction_id: String
+  create_at: Date
+  update_at: Date
+}
+
+type StuffIssue {
+  id: String
+  author_id: String
+  author: User
+  user_id: String
+  user: User
+  description: String
+  stuff_id: String
+  solved: Boolean
+  stuff: Stuff
+  create_at: Date
+  update_at: Date
+}
+
+# Input
+input CreateStuffIssue {
+  description: String
+  user_id: String
+  stuff_id: String
+}
+
+input TagWithStuffValueInput {
+  tag_slug: String
+  value: String
+}
+
+input StuffInput {
+  author_id: String!
+  name: String!
+  type: String!
+  description: String
+  category: String!
+  condition: Int!
+  custom_fields: StuffCustomFieldsInput
+  media: [File]!
+  tags: [TagWithStuffValueInput]
+  payment_type: String!
+}
+
+input QuicklyStuffInput {
+  stuff_id: String!
+  author_id: String!
+  name: String!
+  category: String!
+  condition: Int!
+  media: [File]!
+  tags: [TagWithStuffValueInput]
+}
+
+input UpdateStuffInput {
+  stuff_id: ID!
+  author_id: String!
+  name: String
+  type: String
+  description: String
+  category: String
+  condition: Int
+  custom_fields: StuffCustomFieldsInput
+  media: [File]
+  tags: [TagWithStuffValueInput]
+  delete_media: [String]
+  payment_type: String
+  update_at: Date
+}
+
+input StuffCustomFieldsInput {
+  price: Int
+  step: Int
+  initial_price: Int
+  duration: Int
+  start_automatically: Boolean
+}
+
+input SearchInput {
+  slug: String
+  keywords: String!
+  page: Int
+}
+
+input ExchangeInput {
+  stuff_id: String!
+  suggest_stuff_id: String!
+}
+
+input InformationInput {
+  phone: String
+  address: String
+  address_details: String
+  full_name: String
+}
+
+input UserUpdateInforInput {
+  information: InformationInput
+}
+
+input TransactionInput {
+  stuff_id: String!
+  exchange_stuff_id: String
+  is_pickup: Boolean!
+  expire_at: Date
+}
+
+input FeedbackInput {
+  feedback_id: String!
+  content: String
+  rating: Int!
+}
+
+input MessageInput {
+  channel_id: String!
+  external_id: String!
+  content: String!
+}
+
+input TransactionEvidence {
+  transaction_id: String!
+  media: [File]
+}
+
+input UserRequestCancel {
+  transaction_id: String!
+  issue: String!
+}
+
+input MODCreateIssue {
+  transaction_id: String!
+  issue: String!
+  issue_tag_user: String
+  issue_solved: Boolean
+}
+
+input HandleIssue {
+  transaction_issue_id: String!
+  issue_solved: String!
+}

@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #__next {
+    @apply h-full min-h-screen;
+  }
+
+  body {
+    @apply text-slate-800;
+  }
+
+  * {
+    @apply scrollbar-thin scrollbar-thumb-gray-300 scrollbar-thumb-rounded-full hover:scrollbar-thumb-gray-400/80;
+  }
+
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold;
+  }
+
+  h1 {
+    @apply text-5xl font-extrabold;
+  }
+
+  h2 {
+    @apply text-3xl;
+  }
+
+  h3 {
+    @apply text-2xl;
+  }
+
+  h4 {
+    @apply text-xl;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto max-w-7xl px-3;
+  }
+}
+
+:where(.css-dev-only-do-not-override-w8mnev).ant-btn-primary {
+  background-color: #1677ff !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  @apply aspect-square !h-10 !w-10 !text-black;
+}
+
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  @apply !text-xl font-bold;
+}
+
+.swiper-button-disabled {
+  @apply !text-gray-600;
+}
+
+.ant-upload-list-picture {
+  max-height: 100%;
+  overflow: auto;
+}
